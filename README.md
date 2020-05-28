@@ -10,3 +10,10 @@ A python telegram bot to fetch real time finance data of different stocks, top a
 - **/index *country*** - gets you real time price of stock indices of a given country along with the chart of variation of stock indice
 - **/comlist** - gets you the list of commodities the bot has the data for
 - **/com *commodity*** - gets you real time price of a given commodity
+
+## Example
+
+                                                  
+![Bot 2](/img/bot2.gif)                                                ![Bot 1](/img/bot1.gif)
+
+
