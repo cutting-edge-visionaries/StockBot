@@ -1,5 +1,4 @@
 from telegram.ext import Updater, CommandHandler
-import config
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -7,6 +6,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 from pandas_datareader import data as pdr
 from io import BytesIO
+import os
 
 
 # function to get latest finance news articles
@@ -26,7 +26,7 @@ def get_news():
         if len(link.text) > 30:
             hrefs.append(link['href'])
 
-    top5 = "Here's your latest finance news atricles:\n"
+    top5 = "Here's your latest finance news articles:\n"
     for i in range(0, 5):
         top5 += headlines[i] + "\n" + hrefs[i] + "\n"
     return top5
@@ -182,7 +182,17 @@ def commodity_price(commodity):
 
 
 def start(update, context):
-    context.bot.send_message(chat_id = update.effective_chat.id, text = "Hey there, Wanna know about Stock Market and stuff?")
+    context.bot.send_message(chat_id = update.effective_chat.id, text = '''
+Use these commands to use the bot:
+/news - get the latest finance news articles
+/quantopian - get top articles of Algorithmic Trading from Quantopian
+/alpha - get top algo trading models
+/quantstart - get top articles of Algorithmic Trading from Quantstart
+/country - get the list of countries the bot has the data for
+/index - get real time price & chart of stock indices of a given country
+/comlist - get the list of commodities the bot has the data for
+/com - get real time price of a given commodity
+/help - get list of commands of the bot''')
 
 # function to display top 5 finance news headlines
 def get_top_news(update, context):
@@ -267,12 +277,24 @@ def get_commodity_prices(update, context):
     else:
         context.bot.send_message(chat_id = update.effective_chat.id, text = commodities)
 
+# function to get list of all commands
+def get_commands(update, context):
+    context.bot.send_message(chat_id = update.effective_chat.id, text = '''
+/news - get the latest finance news articles
+/quantopian - get top articles of Algorithmic Trading from Quantopian
+/alpha - get top algo trading models
+/quantstart - get top articles of Algorithmic Trading from Quantstart
+/country - get the list of countries the bot has the data for
+/index - get real time price & chart of stock indices of a given country
+/comlist - get the list of commodities the bot has the data for
+/com - get real time price of a given commodity
+/help - get list of commands of the bot''')
+
 
 
 
 def main():
-    TOKEN = config.API_TOKEN
-    #PORT = int(os.environ.get('PORT', '8443'))
+    TOKEN = os.getenv("TOKEN")
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
     start_handler = CommandHandler('start', start)
@@ -293,12 +315,12 @@ def main():
     dp.add_handler(commodity_handler)
     commodity_price_handler = CommandHandler('com', get_commodity_prices)
     dp.add_handler(commodity_price_handler)
-    updater.start_polling()
-    updater.idle()
-'''
+    command_handler = CommandHandler('help', get_commands)
+    dp.add_handler(command_handler)
+    PORT = int(os.environ.get('PORT', 5000))
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://<>.com/" + TOKEN)
-'''
+    updater.bot.set_webhook("https://aryavarta-bot.herokuapp.com/" + TOKEN)
+    updater.idle()
 
 
 if __name__ == '__main__':
